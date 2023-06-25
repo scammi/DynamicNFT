@@ -7,7 +7,7 @@ import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 contract ManaToken is ERC20, Ownable {
     constructor() ERC20("ManaToken", "MANA") {}
 
-    function mint(address to, uint256 amount) public onlyOwner {
+    function mint(address to, uint256 amount) public {
         _mint(to, amount);
     }
 }

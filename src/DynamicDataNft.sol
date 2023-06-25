@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 import "lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "lib/openzeppelin-contracts/contracts/utils/Counters.sol";
-import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import "src/Mana.sol";
 
 interface IRegistry {
     function createAccount(
@@ -30,7 +30,7 @@ contract DynamicDataNft is ERC721, Ownable {
 
     address public constant REGISTRY = 0x02101dfB77FDE026414827Fdc604ddAF224F0921;
     address public constant IMPLMENTATION = 0xa786cF1e3245C792474c5cc7C23213fa2c111A95;
-    address public manaTokenAddress = 0xc7684ff2f986020b5938082938ad45c6481d9f42;
+    address public manaTokenAddress = 0xf63B69DA14eC50ddEf378e7689b40A5B9b7184F6;
 
     Counters.Counter private _tokenIdCounter;
 
@@ -70,7 +70,7 @@ contract DynamicDataNft is ERC721, Ownable {
         returns (uint256)    
     {
         address tokenBoundAccount = this.getAccount(tokenId);
-        uint256 tokenBalance = ERC20(manaTokenAddress).balanceOf(tokenBoundAccount);
+        uint256 tokenBalance = ManaToken(manaTokenAddress).balanceOf(tokenBoundAccount);
         return tokenBalance;
     }
 
@@ -83,6 +83,11 @@ contract DynamicDataNft is ERC721, Ownable {
         return this.createAccount(tokenId);
     }
 
+    function increaseTokenManaBalance(uint256 amount, uint256 tokenId) public {
+        address tokenBoundAccount = this.getAccount(tokenId); 
+        ManaToken(manaTokenAddress).mint(tokenBoundAccount, amount);
+    }
+
     function tokenURI(uint256 tokenId)
         public
         view
@@ -90,16 +95,24 @@ contract DynamicDataNft is ERC721, Ownable {
         returns (string memory)
     {
         uint256 tokenBalance = this.getTokenManaBalance(tokenId);
+        string memory tokenBalanceAsString = _toString(tokenBalance);
 
-        string[3] memory parts;
+        string[5] memory parts;
         parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="#';
-        parts[1] = getColor(tokenBalance);
-        parts[2] = '"/></svg>';
+        parts[1] = _getColor(tokenBalance);
+        parts[2] = '"/><text x="10" y="20" class="base">Balance: ';
+        parts[3] = tokenBalanceAsString;
+        parts[4] = '</text></svg>';
 
-        string memory output = string(abi.encodePacked(parts[0], parts[1], parts[2]));
-        string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "Bag #', _toString(1), '", "description": "Loot is randomized adventurer you want.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
+
+        string memory output = string(abi.encodePacked(parts[0], parts[1], parts[2], parts[3], parts[4]));
+        string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "Dynamic NFT #', _toString(tokenId), '", "balance": "', tokenBalanceAsString, '", "description": "Dynamic NFT.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
         output = string(abi.encodePacked('data:application/json;base64,', json));
         return output;
+    }
+
+    function setManaTokenAddress(address manaAddress) public {
+        manaTokenAddress = manaAddress;
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -133,11 +146,7 @@ contract DynamicDataNft is ERC721, Ownable {
         return string(buffer);
     }
 
-    function setManaTokenAddress(address manaAddress) public {
-        manaTokenAddress = manaAddress;
-    }
-
-    function getColor(uint256 value) public pure returns (string memory) {
+    function _getColor(uint256 value) internal pure returns (string memory) {
         // Define the maximum value and range of brightness
         uint256 maxValue = 10**18; // Maximum value (adjust as needed)
         uint256 maxBrightness = 255; // Maximum brightness (adjust as needed)
@@ -216,4 +225,5 @@ library Base64 {
 
         return string(result);
     }
+
 }

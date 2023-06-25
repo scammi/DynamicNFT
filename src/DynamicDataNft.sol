@@ -30,7 +30,7 @@ contract DynamicDataNft is ERC721, Ownable {
 
     address public constant REGISTRY = 0x02101dfB77FDE026414827Fdc604ddAF224F0921;
     address public constant IMPLMENTATION = 0xa786cF1e3245C792474c5cc7C23213fa2c111A95;
-    address public manaTokenAddress = 0xc3F28bAE24121D1B4252702e7C2e9506C48c395c;
+    address public manaTokenAddress = 0xc7684ff2f986020b5938082938ad45c6481d9f42;
 
     Counters.Counter private _tokenIdCounter;
 

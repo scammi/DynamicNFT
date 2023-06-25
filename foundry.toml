@@ -1,5 +1,5 @@
 [rpc_endpoints]
-goerli = "${GOERLI_RPC_URL}"
+mumbai = "${PLOLYGON_RPC_URL}"
 
 [etherscan]
-goerli = { key = "${ETHERSCAN_API_KEY}" }
+mumbai = { key = "${POLYGONSCAN_API_KEY}" }

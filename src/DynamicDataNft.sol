@@ -31,7 +31,6 @@ contract DynamicDataNft is ERC721, Ownable {
     address public constant REGISTRY = 0x02101dfB77FDE026414827Fdc604ddAF224F0921;
     address public constant IMPLMENTATION = 0xa786cF1e3245C792474c5cc7C23213fa2c111A95;
     address public manaTokenAddress = 0xc3F28bAE24121D1B4252702e7C2e9506C48c395c;
-    uint256 public constant CHAIN_ID = 80001;
 
     Counters.Counter private _tokenIdCounter;
 
@@ -43,7 +42,7 @@ contract DynamicDataNft is ERC721, Ownable {
     {
         return IRegistry(REGISTRY).createAccount(
             IMPLMENTATION,
-            CHAIN_ID,
+            block.chainid,
             address(this),
             tokenId,
             0,
@@ -58,7 +57,7 @@ contract DynamicDataNft is ERC721, Ownable {
     {
         return IRegistry(REGISTRY).account(
             IMPLMENTATION,
-            CHAIN_ID,
+            block.chainid,
             address(this),
             tokenId,
             0
@@ -75,10 +74,13 @@ contract DynamicDataNft is ERC721, Ownable {
         return tokenBalance;
     }
 
-    function safeMint(address to) public onlyOwner {
+    function safeMint(address to) public returns (address){
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
+
+        // Create account
+        return this.createAccount(tokenId);
     }
 
     function tokenURI(uint256 tokenId)
@@ -95,7 +97,7 @@ contract DynamicDataNft is ERC721, Ownable {
         parts[2] = '"/></svg>';
 
         string memory output = string(abi.encodePacked(parts[0], parts[1], parts[2]));
-        string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "Bag #', toString(1), '", "description": "Loot is randomized adventurer you want.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
+        string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "Bag #', _toString(1), '", "description": "Loot is randomized adventurer you want.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
         output = string(abi.encodePacked('data:application/json;base64,', json));
         return output;
     }
@@ -109,7 +111,7 @@ contract DynamicDataNft is ERC721, Ownable {
         return super.supportsInterface(interfaceId);
     }
 
-    function toString(uint256 value) internal pure returns (string memory) {
+    function _toString(uint256 value) internal pure returns (string memory) {
         // Inspired by OraclizeAPI's implementation - MIT licence
         // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
 

@@ -6,10 +6,11 @@ import "../src/DynamicDataNft.sol";
 
 contract MyScript is Script {
     function run() external {
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        string memory mnemonic = vm.envString("MNEMONIC");
+        uint256 deployerPrivateKey = vm.deriveKey(mnemonic, 0);
         vm.startBroadcast(deployerPrivateKey);
 
-        DynamicDataNft nft = new DynamicDataNft();
+        new DynamicDataNft();
 
         vm.stopBroadcast();
     }

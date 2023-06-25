@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 contract UriTest {
-    function uri() public returns (string memory) {
+    function uri() public pure returns (string memory) {
         string[2] memory parts;
         parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" />';
         parts[1] = '</svg>';
